@@ -20,13 +20,13 @@ def MSE_dw(y, X, w):
 
 def least_squares_GD(y, tx, initial_w, max_iter, gamma):
        
-        next_w = initial_w
+    next_w = initial_w
         
-        for i in range(max_iter):
-            current_w = next_w
-            next_w = current_w - gamma * MSE_dw(y, tx, current_w)
+    for i in range(max_iter):
+        current_w = next_w
+        next_w = current_w - gamma * MSE_dw(y, tx, current_w)
             
-        return (next_w, MSE(y, tx, next_w))
+    return (next_w, MSE(y, tx, next_w))
     
     
 def least_squares_SGD(y, tx, initial_w, max_iter, gamma):
