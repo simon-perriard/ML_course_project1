@@ -34,8 +34,6 @@ def least_squares_SGD(y, tx, initial_w, max_iter, gamma):
     next_w = initial_w
     
     mini_batch_size = 1
-    n_params = tx.shape[1]
-    batch_shape = (mini_batch_size, n_params)
 
     random_indexes = np.zeros((1, mini_batch_size))
     
