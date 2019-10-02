@@ -33,10 +33,11 @@ def least_squares_SGD(y, tx, initial_w, max_iter, gamma):
     
     mini_batch_size = 1
     mini_batch_indices_to_take = np.arange(mini_batch_size)
+    indices = np.arange(len(y))
 
     
     for i in range(max_iter):
-        shuffled_indices = np.random.permutation(np.arange(len(w)))
+        shuffled_indices = np.random.permutation(indices)
         
         mini_batch_indices = np.take(shuffled_indices, mini_batch_indices_to_take)
         
