@@ -105,3 +105,6 @@ venv.bak/
 
 # raw data
 *.csv
+
+# locks
+*.~lock.*
