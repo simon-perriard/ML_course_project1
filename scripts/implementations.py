@@ -47,3 +47,7 @@ def least_squares_SGD(y, tx, initial_w, max_iter, gamma):
         w = w - gamma * MSE_gradient(mini_batch_y, mini_batch_X, w)
     
     return (w, MSE_loss(y, tx, w))
+
+def least_squares(y, tx):
+    
+    return np.linalg.lstsq(tx.T@tx, tx.T@y)
