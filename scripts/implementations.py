@@ -7,43 +7,42 @@ def normalize(tx):
     
     return (tx-mean) / std
 
-def MSE(y, tx, w):
-    e = y- tx@w
+def MSE_loss(y, tx, w):
+    e = y - tx@w
     
     return 1/2 * np.mean(e**2)
 
-def MSE_dw(y, tx, w):
+def MSE_gradient(y, tx, w):
     e = y - tx@w
     return -tx.T@e/len(e)
     
 
 def least_squares_GD(y, tx, initial_w, max_iter, gamma):
        
-    next_w = initial_w
+    w = initial_w
         
     for i in range(max_iter):
-        current_w = next_w
-        next_w = current_w - gamma * MSE_dw(y, tx, current_w)
+        w = w - gamma * MSE_gradient(y, tx, current_w)
             
-    return (next_w, MSE(y, tx, next_w))
+    return (w, MSE_loss(y, tx, w))
     
     
 def least_squares_SGD(y, tx, initial_w, max_iter, gamma):
     
-    next_w = initial_w
+    w = initial_w
     
     mini_batch_size = 1
+    mini_batch_indices_to_take = np.arange(mini_batch_size)
 
-    random_indexes = np.zeros((1, mini_batch_size))
     
     for i in range(max_iter):
+        shuffled_indices = np.random.permutation(np.arange(len(w)))
         
-        random_indexes = np.random.uniform(0, tx.shape[0], mini_batch_size)
+        mini_batch_indices = np.take(shuffled_indices, mini_batch_indices_to_take)
         
-        mini_batch_X = tx[random_indexes]
-        mini_batch_y = y[random_indexes]
+        mini_batch_X = tx[mini_batch_indices]
+        mini_batch_y = y[mini_batch_indices]
         
-        current_w = next_w
-        next_w = current_w - gamma * MSE_dw(mini_batch_y, mini_batch_X, current_w)
+        w = w - gamma * MSE_gradient(mini_batch_y, mini_batch_X, w)
     
-    return (next_w, MSE(y, tx, new_w))
+    return (w, MSE_loss(y, tx, w))
