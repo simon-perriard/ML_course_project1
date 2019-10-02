@@ -1,21 +1,20 @@
 # -*- coding: utf-8 -*-
 import numpy as np
 
-def normalize(X):
-    mean = np.mean(X)
-    std = np.std(x)
+def normalize(tx):
+    mean = np.mean(tx)
+    std = np.std(tx)
     
-    return (X-mean) / std
+    return (tx-mean) / std
 
-def MSE(y, X, w):
-    N = X.shape[0]
+def MSE(y, tx, w):
+    e = y- tx@w
     
-    return 1/(2*N) * (y - X@w).T @ (y - X@w)
+    return 1/2 * np.mean(e**2)
 
-def MSE_dw(y, X, w):
-    N = X.shape[0]
-    
-    return -1/N * X.T @ (y - X@w)
+def MSE_dw(y, tx, w):
+    e = y - tx@w
+    return -tx.T@e/len(e)
     
 
 def least_squares_GD(y, tx, initial_w, max_iter, gamma):
