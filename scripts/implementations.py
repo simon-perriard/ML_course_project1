@@ -13,6 +13,7 @@ def MSE_loss(y, tx, w):
     return 1/2 * np.mean(e**2)
 
 def MSE_gradient(y, tx, w):
+    
     e = y - tx@w
     return -tx.T@e/len(e)
     
@@ -22,7 +23,7 @@ def least_squares_GD(y, tx, initial_w, max_iter, gamma):
     w = initial_w
         
     for i in range(max_iter):
-        w = w - gamma * MSE_gradient(y, tx, current_w)
+        w = w - gamma * MSE_gradient(y, tx, w)
             
     return (w, MSE_loss(y, tx, w))
     
@@ -49,5 +50,5 @@ def least_squares_SGD(y, tx, initial_w, max_iter, gamma):
     return (w, MSE_loss(y, tx, w))
 
 def least_squares(y, tx):
-    
-    return np.linalg.lstsq(tx.T@tx, tx.T@y)
+    w = np.linalg.lstsq(tx.T@tx, tx.T@y, rcond=None)[0]
+    return (w, MSE_loss(y, tx, w))
