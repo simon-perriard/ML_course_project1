@@ -7,10 +7,12 @@ def normalize(tx):
     
     return (tx-mean) / std
 
+
 def MSE_loss(y, tx, w):
     e = y - tx@w
     
-    return 1/2 * np.mean(e**2)
+    return np.mean(e**2)/2
+
 
 def MSE_gradient(y, tx, w):
     
@@ -49,6 +51,54 @@ def least_squares_SGD(y, tx, initial_w, max_iter, gamma):
     
     return (w, MSE_loss(y, tx, w))
 
+
 def least_squares(y, tx):
+    
     w = np.linalg.lstsq(tx.T@tx, tx.T@y, rcond=None)[0]
+    
     return (w, MSE_loss(y, tx, w))
+
+
+def ridge_regression(y, tx, lambda_):
+    
+    added_term = 2*len(y)*lambda_*np.identity(tx.shape[1])
+    
+    w = np.linalg.lstsq(tx.T@tx + added_term, tx.T@y, rcond=None)[0]
+    
+    return (w, MSE_loss(y, tx, w))
+
+
+def logistic_loss(y, tx, w):
+    
+    return np.sum(np.log(1 + np.exp(tx@w)) - y@(tx@w))
+
+
+def sigmoid(z):
+    
+    return 1.0/(1 + np.exp(-z))
+
+
+def logistic_gradient(y, tx, w):
+    
+    return tx.T@(sigmoid(tx@w) - y)
+
+
+def logistic_regression(y, tx, initial_w, max_iters, gamma):
+
+    w = initial_w
+
+    for i in range(max_iters):
+        w = w - gamma * logistic_gradient(y, tx, w)
+        
+    return (w, logistic_loss(y, tx, w))
+
+
+
+
+
+
+
+
+
+
+
