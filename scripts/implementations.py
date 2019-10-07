@@ -93,7 +93,17 @@ def logistic_regression(y, tx, initial_w, max_iters, gamma):
     return (w, logistic_loss(y, tx, w))
 
 
-
+def putTogether(y, indices):
+    length = 0
+    for i in range(4):
+        length += len(y[i])
+    
+    new = np.zeros((length, 2))
+    
+    for i in range (y.shape[0]):
+        for j in range (y[i].shape[0]):
+            a = 2
+        
 
 
 
