@@ -104,7 +104,7 @@ def reg_logistic_regression(y, tx, lambda_, initial_w, max_iters, gamma):
         w = w - gamma * logistic_gradient(y, tx, w)
     
     loss = logistic_loss(y, tx, w) + lambda_ * np.sum(w**2)
-    return (w, logistic_loss(y, tx, w))
+    return (w, loss)
 
 
 def putTogether(y, indices):
