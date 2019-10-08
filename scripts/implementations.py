@@ -96,7 +96,7 @@ def logistic_regression(y, tx, initial_w, max_iters, gamma):
 
 
 
-def reg_logistic_regression(y, tx, lambda_, initial w, max iters, gamma):
+def reg_logistic_regression(y, tx, lambda_, initial_w, max_iters, gamma):
     
     w = initial_w
 
