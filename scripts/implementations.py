@@ -63,11 +63,10 @@ def ridge_regression(y, tx, lambda_):
     
    
     
-    w = np.linalg.lstsq(tx.T@tx , tx.T@y, rcond=None)[0]
+    w = np.linalg.lstsq(tx.T@tx + 2 * len(y) * lambda_ * np.identity(tx.shape[1]), tx.T@y, rcond=None)[0]
     
-    loss = MSE_loss(y, tx, w) + lambda_ * np.sum(w**2)
     
-    return (w, loss)
+    return (w, MSE_loss(y, tx, w) )
 
 
 def logistic_loss(y, tx, w):
