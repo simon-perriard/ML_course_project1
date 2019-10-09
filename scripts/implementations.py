@@ -61,11 +61,13 @@ def least_squares(y, tx):
 
 def ridge_regression(y, tx, lambda_):
     
-    added_term = 2*len(y)*lambda_*np.identity(tx.shape[1])
+   
     
-    w = np.linalg.lstsq(tx.T@tx + added_term, tx.T@y, rcond=None)[0]
+    w = np.linalg.lstsq(tx.T@tx , tx.T@y, rcond=None)[0]
     
-    return (w, MSE_loss(y, tx, w))
+    loss = MSE_loss(y, tx, w) + lambda_ * np.sum(w**2)
+    
+    return (w, loss)
 
 
 def logistic_loss(y, tx, w):
@@ -101,7 +103,7 @@ def reg_logistic_regression(y, tx, lambda_, initial_w, max_iters, gamma):
     w = initial_w
 
     for i in range(max_iters):
-        w = w - gamma * logistic_gradient(y, tx, w)
+        w = w - gamma * (logistic_gradient(y, tx, w) + lambda_ * 2 * w)
     
     loss = logistic_loss(y, tx, w) + lambda_ * np.sum(w**2)
     return (w, loss)
