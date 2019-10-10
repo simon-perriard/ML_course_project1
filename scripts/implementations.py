@@ -2,9 +2,14 @@
 import numpy as np
 
 def normalize(tx):
-    mean = np.mean(tx)
-    std = np.std(tx)
+    mean = np.mean(tx, axis=0)
+    std = np.std(tx, axis=0)
     
+    for i in range(len(std)):
+        
+        if(std[i] == 0):
+            std[i] = 1
+        
     return (tx-mean) / std
 
 
