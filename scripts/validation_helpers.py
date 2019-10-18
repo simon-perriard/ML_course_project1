@@ -1,0 +1,325 @@
+# -*- coding: utf-8 -*-
+import numpy as np
+from proj1_helpers import *
+from implementations import *
+
+#perform cross-validation using the accuracy 
+
+def crossValidation(x, y, splitRatio, degrees, seed =1):
+    
+    x_train, y_train, x_test, y_test = split_data(x, y, splitRatio, seed)
+    
+    a_training = []
+    a_testing = []
+    weights = []
+    degr = []
+    
+    # define parameter (just add more for loops if there are more parameters for the model)
+    lambdas = np.arange(0.000001,0.00001,0.000001)
+    lambdas = [0]
+    
+    for ind, lambda_ in enumerate(lambdas):
+        
+        for ind_d, d in enumerate(degrees):
+            
+            
+            #perform polynomial feature expension
+            x_test_poly = build_poly(x_test,d)
+            x_train_poly = build_poly(x_train, d)
+           
+            
+            #normalize data (DANGER: the test set must be normalized with the training set's mean and std)
+            mean = np.mean(x_train_poly, axis =0)
+            std = np.std(x_train_poly, axis = 0)
+            
+              
+            #put 1 if std = 0
+            std = std + (std == 0)
+
+            
+            x_train_ready = (x_train_poly - mean) / std
+            x_test_ready = (x_test_poly - mean) / std
+            
+            
+            #add bias term
+            bias_tr = np.ones(shape=x_train.shape)
+            bias_te = np.ones(shape=x_test.shape)
+            
+            x_train_ready = np.c_[bias_tr, x_train_ready]
+            x_test_ready = np.c_[bias_te, x_test_ready]
+            
+            
+            #Models
+        
+            #ideal :  lambdas = np.arange(0,0.000001,0.0000001) => 81.9 %
+            w_star, e_tr = ridge_regression(y_train,x_train_ready, lambda_)
+        
+            #ideal : lambdas = np.arange(0,0.3,0.1)
+            #w_star, e_tr = logistic_regression(y_train, x_train_ready,np.ones(x_train_ready.shape[1])  ,400, lambda_)
+        
+            #don't usel least squares with lambda bigger than 0.35 ideal: lambdas = np.arange(0.001,0.13,0.01)
+            #w_star, e_tr = least_squares_GD(y_train, x_train_ready,np.ones(x_train_ready.shape[1])  ,400, lambda_)    
+            #w_star, e_tr = least_squares_SGD(y_train, x_train,np.ones(x_train.shape[1])  ,400, lambda_)
+        
+            #DON'T REALLY NEED TO DO CROSS VALIDATION FOR THIS ONE ;) BUT PRACTICAL TO RUN IT HERE
+            #w_star, e_tr = least_squares(y_train, x_train_ready)  
+        
+            degr.append(d)
+        
+            #compare the prediction with the reality
+            accuracy_training = np.count_nonzero(predict_labels(w_star, x_train_ready) + y_train)/len(y_train)
+            accuracy_testing = np.count_nonzero(predict_labels(w_star, x_test_ready) + y_test)/len(y_test)
+        
+            a_training.append(accuracy_training)
+            a_testing.append(accuracy_testing)
+            weights.append(w_star)
+            print("lambda={l:.5f},degree={deg}, Training Accuracy={tr}, Testing Accuracy={te}".format(
+                   l=lambda_, tr=a_training[ind*len(degrees)+ind_d], te=a_testing[ind*len(degrees)+ind_d], deg=d))
+        
+            
+    
+    return weights[np.argmax(a_testing)], degr[np.argmax(a_testing)], a_testing[np.argmax(a_testing)], x_train
+    
+    
+    
+    
+    
+#perform cross-validation using the loss instead of the accuracy 
+
+def crossValidation_with_loss(x, y, splitRatio, degrees, seed =1):
+    
+    x_train, y_train, x_test, y_test = split_data(x, y, splitRatio, seed)
+    
+    loss_tr = []
+    loss_te = []
+    weights = []
+    degr = []
+    
+    # define parameter (just add more for loops if there are more parameters for the model)
+    lambdas = np.arange(0.000001,0.00001,0.000001)
+    lambdas = [0]
+    
+    for ind, lambda_ in enumerate(lambdas):
+        
+        for ind_d, d in enumerate(degrees):
+            
+            
+            #perform polynomial feature expension
+            x_test_poly = build_poly(x_test,d)
+            x_train_poly = build_poly(x_train, d)
+           
+            
+            #normalize data (DANGER: the test set must be normalized with the training set's mean and std)
+            mean = np.mean(x_train_poly, axis =0)
+            std = np.std(x_train_poly, axis = 0)
+            
+              
+            #put 1 if std = 0
+            std = std + (std == 0)
+
+            
+            x_train_ready = (x_train_poly - mean) / std
+            x_test_ready = (x_test_poly - mean) / std
+            
+            
+            #add bias term
+            bias_tr = np.ones(shape=x_train.shape)
+            bias_te = np.ones(shape=x_test.shape)
+            
+            x_train_ready = np.c_[bias_tr, x_train_ready]
+            x_test_ready = np.c_[bias_te, x_test_ready]
+            
+            
+            #Models
+        
+            #ideal :  lambdas = np.arange(0,0.000001,0.0000001) => 81.9 %
+            w_star, e_tr = ridge_regression(y_train,x_train_ready, lambda_)
+        
+            #ideal : lambdas = np.arange(0,0.3,0.1)
+            #w_star, e_tr = logistic_regression(y_train, x_train_ready,np.ones(x_train_ready.shape[1])  ,400, lambda_)
+        
+            #don't usel least squares with lambda bigger than 0.35 ideal: lambdas = np.arange(0.001,0.13,0.01)
+            #w_star, e_tr = least_squares_GD(y_train, x_train_ready,np.ones(x_train_ready.shape[1])  ,400, lambda_)    
+            #w_star, e_tr = least_squares_SGD(y_train, x_train,np.ones(x_train.shape[1])  ,400, lambda_)
+        
+            #DON'T REALLY NEED TO DO CROSS VALIDATION FOR THIS ONE ;) BUT PRACTICAL TO RUN IT HERE
+            #w_star, e_tr = least_squares(y_train, x_train_ready)  
+        
+            degr.append(d)
+        
+        
+            #compute the loss on the test set
+            
+            e_te = MSE_loss(y_test, x_test_ready, w_star)
+           
+        
+            loss_tr.append(e_tr)
+            loss_te.append(e_te)
+            weights.append(w_star)
+            print("lambda={l:.5f},degree={deg}, Training Loss={tr}, Testing Loss={te}".format(
+                   l=lambda_, tr=loss_tr[ind*len(degrees)+ind_d], te=loss_te[ind*len(degrees)+ind_d], deg=d))
+        
+            
+    
+    return weights[np.argmin(loss_te)], degr[np.argmin(loss_te)], loss_te[np.argmin(loss_te)], x_train
+    
+    
+    
+
+#perform cross-validation 
+
+def crossValidationForLogistic_reg(x, y, splitRatio, degrees, seed =1):
+    
+    x_train, y_train, x_test, y_test = split_data(x, y, splitRatio, seed)
+    
+    a_training = []
+    a_testing = []
+    weights = []
+    degr = []
+    
+    index = 0
+    
+    # define parameter (just add more for loops if there are more parameters for the model)
+    lambdas = np.arange(0.0001,0.3,0.1)
+    gammas = np.arange(0.01,1,0.3)
+    
+    for ind, lambda_ in enumerate(lambdas):
+        
+        for ind_d, d in enumerate(degrees):
+            
+            for ind_g, gamma in enumerate(gammas):
+            
+                #perform polynomial feature expension
+                x_test_poly = build_poly(x_test,d)
+                x_train_poly = build_poly(x_train, d)
+            
+                #normalize data (DANGER: the test set must be normalized with the training set's mean and std)
+                mean = np.mean(x_train_poly, axis =0)
+                std = np.std(x_train_poly, axis = 0)
+            
+                #put 1 if std = 0
+                std = std + (std == 0)
+            
+                x_train_ready = (x_train_poly - mean) / std
+                x_test_ready = (x_test_poly - mean) / std
+                
+               
+                #add bias term
+                
+                bias_tr = np.ones(shape=x_train.shape)
+                bias_te = np.ones(shape=x_test.shape)
+            
+                x_train_ready = np.c_[bias_tr, x_train_ready]
+                x_test_ready = np.c_[bias_te, x_test_ready]
+                
+           
+
+                #Model
+        
+                #ideal :lambdas = np.arange(0,0.3,0.01)
+                #       gammas = np.arange(0,3,0.5)
+                w_star, e_tr = reg_logistic_regression(y_train, x_train_ready, lambda_, np.ones(x_test_ready.shape[1]), 30, gamma)
+        
+           
+                degr.append(d)
+        
+                #compare the prediction with the reality
+                accuracy_training = np.count_nonzero(predict_labels(w_star, x_train_ready) + y_train)/len(y_train)
+                accuracy_testing = np.count_nonzero(predict_labels(w_star, x_test_ready) + y_test)/len(y_test)
+        
+                a_training.append(accuracy_training)
+                a_testing.append(accuracy_testing)
+                weights.append(w_star)
+                print("lambda={l:.5f},degree={deg}, gamma={ga:.5f}, Training Accuracy={tr}, Testing Accuracy={te}".format(
+                       l=lambda_, tr=a_training[index], te=a_testing[index], deg=d, ga=gamma))
+        
+                #increment index
+                index = index + 1
+    
+    return weights[np.argmax(a_testing)], degr[np.argmax(a_testing)], a_testing[np.argmax(a_testing)], x_train    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+
+#perform cross-validation using the loss
+
+def crossValidationForLogistic_reg_with_loss(x, y, splitRatio, degrees, seed =1):
+    
+    x_train, y_train, x_test, y_test = split_data(x, y, splitRatio, seed)
+    
+    loss_tr = []
+    loss_te = []
+    weights = []
+    degr = []
+    
+    index = 0
+    
+    # define parameter (just add more for loops if there are more parameters for the model)
+    lambdas = np.arange(0.0001,0.3,0.1)
+    gammas = np.arange(0.01,1,0.3)
+    
+    for ind, lambda_ in enumerate(lambdas):
+        
+        for ind_d, d in enumerate(degrees):
+            
+            for ind_g, gamma in enumerate(gammas):
+            
+                #perform polynomial feature expension
+                x_test_poly = build_poly(x_test,d)
+                x_train_poly = build_poly(x_train, d)
+            
+                #normalize data (DANGER: the test set must be normalized with the training set's mean and std)
+                mean = np.mean(x_train_poly, axis =0)
+                std = np.std(x_train_poly, axis = 0)
+            
+                #put 1 if std = 0
+                std = std + (std == 0)
+            
+                x_train_ready = (x_train_poly - mean) / std
+                x_test_ready = (x_test_poly - mean) / std
+                
+               
+                #add bias term
+                
+                bias_tr = np.ones(shape=x_train.shape)
+                bias_te = np.ones(shape=x_test.shape)
+            
+                x_train_ready = np.c_[bias_tr, x_train_ready]
+                x_test_ready = np.c_[bias_te, x_test_ready]
+                
+           
+
+                #Model
+        
+                #ideal :lambdas = np.arange(0,0.3,0.01)
+                #       gammas = np.arange(0,3,0.5)
+                w_star, e_tr = reg_logistic_regression(y_train, x_train_ready, lambda_, np.ones(x_test_ready.shape[1]), 30, gamma)
+        
+           
+                degr.append(d)
+        
+                #compute the loss on the test set
+                e_te = logistic_loss(y_test, x_test_ready, w_star) + lambda_ * np.sum(w_star**2)
+           
+        
+                loss_tr.append(e_tr)
+                loss_te.append(e_te)
+                weights.append(w_star)
+        
+              
+                print("lambda={l:.5f},degree={deg}, gamma={ga:.5f}, Training Loss={tr}, Testing Loss={te}".format(
+                       l=lambda_, tr=loss_tr[index], te=loss_te[index], deg=d, ga=gamma))
+        
+                #increment index
+                index = index + 1
+    
+    return weights[np.argmin(loss_te)], degr[np.argmin(loss_te)], loss_te[np.argmin(loss_te)], x_train    
+    
+    
