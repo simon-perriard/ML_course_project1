@@ -76,12 +76,23 @@ def ridge_regression(y, tx, lambda_):
 
 def logistic_loss(y, tx, w):
     
-    pred = tx@w
-   
+    pred = sigmoid(tx @ w)
+    #print("prediction")
+    #print(pred)
+    #print(pred[np.where(pred != 0)])
     #loss = -y.T @ np.log(pred) - (1 - y).T @ np.log(1 - pred)  gives erros 
-    loss = np.log(1 + np.exp(pred)) - y.T@(pred) #give infinity
-    loss = np.sum(loss , axis = 0)
-    return loss
+    #loss = np.log(1 + np.exp(pred)) - y.T@(pred) #give infinity
+    #loss = np.sum(loss , axis = 0)
+    loss = 0
+    
+    for n in range (len(y)):
+        
+        if(y[n] == 1):
+            loss += np.log(pred[n])  
+        else:
+            loss += np.log(1 - pred[n])
+            
+    return  - loss
 
 
 def sigmoid(z):
@@ -96,25 +107,31 @@ def logistic_gradient(y, tx, w):
 
 def logistic_regression(y, tx, initial_w, max_iters, gamma):
 
+    t = np.zeros(len(y))
+    t[np.where(y == -1)] = 0
+    
     w = initial_w
 
     for i in range(max_iters):
-        w = w - gamma * logistic_gradient(y, tx, w)
+        w = w - gamma * logistic_gradient(t, tx, w)
         
     
-    return (w, logistic_loss(y, tx, w))
+    return (w, logistic_loss(t, tx, w))
 
 
 
 
 def reg_logistic_regression(y, tx, lambda_, initial_w, max_iters, gamma):
     
+    t = np.zeros(len(y))
+    t[np.where(y == -1)] = 0
+    
     w = initial_w
 
     for i in range(max_iters):
-        w = w - gamma * (logistic_gradient(y, tx, w) + lambda_ * 2 * w)
+        w = w - gamma * (logistic_gradient(t, tx, w) + lambda_  * w)
     
-    loss = logistic_loss(y, tx, w) + lambda_ * np.sum(w**2) 
+    loss = logistic_loss(t, tx, w) + lambda_ * np.sum(w**2) 
     
     return (w, loss)
 

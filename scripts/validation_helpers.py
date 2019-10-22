@@ -317,8 +317,12 @@ def crossValidationForLogistic_reg_with_loss(x, y, splitRatio, degrees, seed =1)
            
                 degr.append(d)
         
+                #map the y= -1 => y = 0
+                t = np.zeros(len(y_test))
+                t[np.where(y_test == -1)] = 0
+                
                 #compute the loss on the test set
-                e_te = logistic_loss(y_test, x_test_ready, w_star) + lambda_ * np.sum(w_star**2)
+                e_te = logistic_loss(t, x_test_ready, w_star) + lambda_ * np.sum(w_star**2)
            
         
                 loss_tr.append(e_tr)
