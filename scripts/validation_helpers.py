@@ -143,6 +143,7 @@ def crossValidation_with_loss(x, y, splitRatio, degrees, seed =1):
             w_star, e_tr = ridge_regression(y_train,x_train_ready, lambda_)
         
             #ideal : lambdas = np.arange(0,0.3,0.1)
+            
             #w_star, e_tr = logistic_regression(y_train, x_train_ready,np.ones(x_train_ready.shape[1])  ,400, lambda_)
         
             #don't usel least squares with lambda bigger than 0.35 ideal: lambdas = np.arange(0.001,0.13,0.01)
@@ -156,8 +157,18 @@ def crossValidation_with_loss(x, y, splitRatio, degrees, seed =1):
         
         
             #compute the loss on the test set
-            
+            #loss for least squares
             e_te = MSE_loss(y_test, x_test_ready, w_star)
+            
+            
+            #loss for logistic regression
+            
+            #need to map the y= -1 => y = 0  for logistic regression 's loss computation
+            #t = np.zeros(len(y_test))
+            #t[np.where(y_test == -1)] = 0
+            #e_tr = logistic_loss(t, x_test_ready, w_star)
+            
+            
             plot_data.append((lambda_, d, e_te))
         
             loss_tr.append(e_tr)
