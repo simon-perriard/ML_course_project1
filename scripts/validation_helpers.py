@@ -14,9 +14,13 @@ def crossValidation(x, y, splitRatio, degrees, seed =1):
     weights = []
     degr = []
     
+    plot_data = []
+
+    
     # define parameter (just add more for loops if there are more parameters for the model)
-    lambdas = np.arange(0.000001,0.00001,0.000001)
+    #lambdas = np.arange(0.000001,0.00001,0.000001)
     lambdas = [0]
+    #lambdas = np.arange(0,0.3,0.1)
     
     for ind, lambda_ in enumerate(lambdas):
         
@@ -52,17 +56,17 @@ def crossValidation(x, y, splitRatio, degrees, seed =1):
             #Models
         
             #ideal :  lambdas = np.arange(0,0.000001,0.0000001) => 81.9 %
-            w_star, e_tr = ridge_regression(y_train,x_train_ready, lambda_)
+            #w_star, e_tr = ridge_regression(y_train,x_train_ready, lambda_)
         
             #ideal : lambdas = np.arange(0,0.3,0.1)
-            #w_star, e_tr = logistic_regression(y_train, x_train_ready,np.ones(x_train_ready.shape[1])  ,400, lambda_)
+            #w_star, e_tr = logistic_regression(y_train, x_train_ready,np.ones(x_train_ready.shape[1])  ,50, lambda_)
         
             #don't usel least squares with lambda bigger than 0.35 ideal: lambdas = np.arange(0.001,0.13,0.01)
             #w_star, e_tr = least_squares_GD(y_train, x_train_ready,np.ones(x_train_ready.shape[1])  ,400, lambda_)    
             #w_star, e_tr = least_squares_SGD(y_train, x_train,np.ones(x_train.shape[1])  ,400, lambda_)
         
             #DON'T REALLY NEED TO DO CROSS VALIDATION FOR THIS ONE ;) BUT PRACTICAL TO RUN IT HERE
-            #w_star, e_tr = least_squares(y_train, x_train_ready)  
+            w_star, e_tr = least_squares(y_train, x_train_ready)  
         
             degr.append(d)
         
@@ -73,12 +77,13 @@ def crossValidation(x, y, splitRatio, degrees, seed =1):
             a_training.append(accuracy_training)
             a_testing.append(accuracy_testing)
             weights.append(w_star)
+            plot_data.append((lambda_, d, accuracy_testing))
             print("lambda={l:.5f},degree={deg}, Training Accuracy={tr}, Testing Accuracy={te}".format(
                    l=lambda_, tr=a_training[ind*len(degrees)+ind_d], te=a_testing[ind*len(degrees)+ind_d], deg=d))
         
             
     
-    return weights[np.argmax(a_testing)], degr[np.argmax(a_testing)], a_testing[np.argmax(a_testing)], x_train
+    return weights[np.argmax(a_testing)], degr[np.argmax(a_testing)], a_testing[np.argmax(a_testing)], x_train, plot_data
     
     
     
@@ -95,9 +100,11 @@ def crossValidation_with_loss(x, y, splitRatio, degrees, seed =1):
     weights = []
     degr = []
     
+    
+    plot_data = []
+    
     # define parameter (just add more for loops if there are more parameters for the model)
     lambdas = np.arange(0.000001,0.00001,0.000001)
-    lambdas = [0]
     
     for ind, lambda_ in enumerate(lambdas):
         
@@ -151,7 +158,7 @@ def crossValidation_with_loss(x, y, splitRatio, degrees, seed =1):
             #compute the loss on the test set
             
             e_te = MSE_loss(y_test, x_test_ready, w_star)
-           
+            plot_data.append((lambda_, d, e_te))
         
             loss_tr.append(e_tr)
             loss_te.append(e_te)
@@ -161,7 +168,7 @@ def crossValidation_with_loss(x, y, splitRatio, degrees, seed =1):
         
             
     
-    return weights[np.argmin(loss_te)], degr[np.argmin(loss_te)], loss_te[np.argmin(loss_te)], x_train
+    return weights[np.argmin(loss_te)], degr[np.argmin(loss_te)], loss_te[np.argmin(loss_te)], x_train, plot_data
     
     
     
@@ -178,10 +185,11 @@ def crossValidationForLogistic_reg(x, y, splitRatio, degrees, seed =1):
     degr = []
     
     index = 0
+    plot_data = []
     
     # define parameter (just add more for loops if there are more parameters for the model)
     lambdas = np.arange(0.0001,0.3,0.1)
-    gammas = np.arange(0.01,1,0.3)
+    gammas = np.arange(0.01,0.9,0.2)
     
     for ind, lambda_ in enumerate(lambdas):
         
@@ -226,7 +234,9 @@ def crossValidationForLogistic_reg(x, y, splitRatio, degrees, seed =1):
                 #compare the prediction with the reality
                 accuracy_training = np.count_nonzero(predict_labels(w_star, x_train_ready) + y_train)/len(y_train)
                 accuracy_testing = np.count_nonzero(predict_labels(w_star, x_test_ready) + y_test)/len(y_test)
-        
+                
+                plot_data.append((lambda_, d, gamma, accuracy_testing))
+
                 a_training.append(accuracy_training)
                 a_testing.append(accuracy_testing)
                 weights.append(w_star)
@@ -236,7 +246,7 @@ def crossValidationForLogistic_reg(x, y, splitRatio, degrees, seed =1):
                 #increment index
                 index = index + 1
     
-    return weights[np.argmax(a_testing)], degr[np.argmax(a_testing)], a_testing[np.argmax(a_testing)], x_train    
+    return weights[np.argmax(a_testing)], degr[np.argmax(a_testing)], a_testing[np.argmax(a_testing)], x_train, plot_data  
     
     
     
@@ -261,9 +271,11 @@ def crossValidationForLogistic_reg_with_loss(x, y, splitRatio, degrees, seed =1)
     
     index = 0
     
+    plot_data = []
+    
     # define parameter (just add more for loops if there are more parameters for the model)
-    lambdas = np.arange(0.0001,0.3,0.1)
-    gammas = np.arange(0.01,1,0.3)
+    lambdas = np.arange(0.000001,0.003,0.001)
+    gammas = np.arange(0.01,0.9,0.2)
     
     for ind, lambda_ in enumerate(lambdas):
         
@@ -312,7 +324,8 @@ def crossValidationForLogistic_reg_with_loss(x, y, splitRatio, degrees, seed =1)
                 loss_tr.append(e_tr)
                 loss_te.append(e_te)
                 weights.append(w_star)
-        
+                
+                plot_data.append((lambda_, d, gamma, e_te))
               
                 print("lambda={l:.5f},degree={deg}, gamma={ga:.5f}, Training Loss={tr}, Testing Loss={te}".format(
                        l=lambda_, tr=loss_tr[index], te=loss_te[index], deg=d, ga=gamma))
@@ -320,6 +333,6 @@ def crossValidationForLogistic_reg_with_loss(x, y, splitRatio, degrees, seed =1)
                 #increment index
                 index = index + 1
     
-    return weights[np.argmin(loss_te)], degr[np.argmin(loss_te)], loss_te[np.argmin(loss_te)], x_train    
+    return weights[np.argmin(loss_te)], degr[np.argmin(loss_te)], loss_te[np.argmin(loss_te)], x_train, plot_data
     
     
