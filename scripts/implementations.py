@@ -76,7 +76,12 @@ def ridge_regression(y, tx, lambda_):
 
 def logistic_loss(y, tx, w):
     
-    return np.sum(np.log(1 + np.exp(tx@w)) - y@(tx@w))
+    pred = tx@w
+   
+    #loss = -y.T @ np.log(pred) - (1 - y).T @ np.log(1 - pred)  gives erros 
+    loss = np.log(1 + np.exp(pred)) - y.T@(pred) #give infinity
+    loss = np.sum(loss , axis = 0)
+    return loss
 
 
 def sigmoid(z):
@@ -109,7 +114,8 @@ def reg_logistic_regression(y, tx, lambda_, initial_w, max_iters, gamma):
     for i in range(max_iters):
         w = w - gamma * (logistic_gradient(y, tx, w) + lambda_ * 2 * w)
     
-    loss = logistic_loss(y, tx, w) + lambda_ * np.sum(w**2)
+    loss = logistic_loss(y, tx, w) + lambda_ * np.sum(w**2) 
+    
     return (w, loss)
 
 
