@@ -77,12 +77,14 @@ def ridge_regression(y, tx, lambda_):
 def logistic_loss(y, tx, w):
     
     pred = sigmoid(tx @ w)
-
+    pred[np.where(pred == 1)] = 0.999999999999999
+    pred[np.where(pred == 0)] = 0.000000000000001
+    
     #print("prediction")
     #print(pred)
     #print(pred[np.where(pred != 0)])
-    #loss = -y.T @ np.log(pred) - (1 - y).T @ np.log(1 - pred)  gives erros 
-    #loss = np.log(1 + np.exp(pred)) - y.T@(pred) #give infinity
+    #loss = -y.T @ np.log(pred) - (1 - y).T @ np.log(1 - pred)  
+    #loss = np.log(1 + np.exp(tx @ w)) - y.T@(tx @ w) #give infinity
     #loss = np.sum(loss , axis = 0)
     loss = 0
     
@@ -98,7 +100,7 @@ def logistic_loss(y, tx, w):
 
 def sigmoid(z):
     
-    return 1.0/(1 + np.exp(-z))
+    return 1 / (1 + np.exp(-z))
 
 
 def logistic_gradient(y, tx, w):
