@@ -2,6 +2,7 @@
 """some helper functions for project 1."""
 import csv
 import numpy as np
+import implementations
 
 
 def load_csv_data(data_path, sub_sample=False):
@@ -31,6 +32,20 @@ def predict_labels(weights, data):
     y_pred[np.where(y_pred > 0)] = 1
     
     return y_pred
+    
+    
+    
+    
+#makes prediction for logistic regression
+def predict_labels_logistic(w, data):
+
+
+    pred = sigmoid(w @ data)
+    
+    pred[np.where(pred < 0.5)] = -1
+    pred[np.where(pred >= 0.5)] = 1
+
+    return pred
 
 
 def create_csv_submission(ids, y_pred, name):
