@@ -19,8 +19,8 @@ def crossValidation(x, y, splitRatio, degrees, seed =1):
     
     # define parameter (just add more for loops if there are more parameters for the model)
     #lambdas = np.arange(0.000001,0.00001,0.000001)
-    lambdas = [0]
-    #lambdas = np.arange(0,0.3,0.1)
+    #lambdas = [0]
+    lambdas = np.arange(0,0.003,0.001)
     
     for ind, lambda_ in enumerate(lambdas):
         
@@ -59,20 +59,24 @@ def crossValidation(x, y, splitRatio, degrees, seed =1):
             #w_star, e_tr = ridge_regression(y_train,x_train_ready, lambda_)
         
             #ideal : lambdas = np.arange(0,0.3,0.1)
-            #w_star, e_tr = logistic_regression(y_train, x_train_ready,np.ones(x_train_ready.shape[1])  ,50, lambda_)
+            w_star, e_tr = logistic_regression(y_train, x_train_ready,np.ones(x_train_ready.shape[1])  ,100, lambda_)
         
             #don't usel least squares with lambda bigger than 0.35 ideal: lambdas = np.arange(0.001,0.13,0.01)
             #w_star, e_tr = least_squares_GD(y_train, x_train_ready,np.ones(x_train_ready.shape[1])  ,400, lambda_)    
             #w_star, e_tr = least_squares_SGD(y_train, x_train,np.ones(x_train.shape[1])  ,400, lambda_)
         
             #DON'T REALLY NEED TO DO CROSS VALIDATION FOR THIS ONE ;) BUT PRACTICAL TO RUN IT HERE
-            w_star, e_tr = least_squares(y_train, x_train_ready)  
+            #w_star, e_tr = least_squares(y_train, x_train_ready)  
         
             degr.append(d)
         
             #compare the prediction with the reality
-            accuracy_training = np.count_nonzero(predict_labels(w_star, x_train_ready) + y_train)/len(y_train)
-            accuracy_testing = np.count_nonzero(predict_labels(w_star, x_test_ready) + y_test)/len(y_test)
+            #accuracy_training = np.count_nonzero(predict_labels(w_star, x_train_ready) + y_train)/len(y_train)
+            #accuracy_testing = np.count_nonzero(predict_labels(w_star, x_test_ready) + y_test)/len(y_test)
+            
+            #compare the prediction with the reality
+            accuracy_training = np.count_nonzero(predict_labels_logistic(w_star, x_train_ready) + y_train)/len(y_train)
+            accuracy_testing = np.count_nonzero(predict_labels_logistic(w_star, x_test_ready) + y_test)/len(y_test)
         
             a_training.append(accuracy_training)
             a_testing.append(accuracy_testing)
@@ -243,8 +247,8 @@ def crossValidationForLogistic_reg(x, y, splitRatio, degrees, seed =1):
                 degr.append(d)
         
                 #compare the prediction with the reality
-                accuracy_training = np.count_nonzero(predict_labels(w_star, x_train_ready) + y_train)/len(y_train)
-                accuracy_testing = np.count_nonzero(predict_labels(w_star, x_test_ready) + y_test)/len(y_test)
+                accuracy_training = np.count_nonzero(predict_labels_logistic(w_star, x_train_ready) + y_train)/len(y_train)
+                accuracy_testing = np.count_nonzero(predict_labels_logistic(w_star, x_test_ready) + y_test)/len(y_test)
                 
                 plot_data.append((lambda_, d, gamma, accuracy_testing))
 
@@ -323,7 +327,7 @@ def crossValidationForLogistic_reg_with_loss(x, y, splitRatio, degrees, seed =1)
         
                 #ideal :lambdas = np.arange(0,0.3,0.01)
                 #       gammas = np.arange(0,3,0.5)
-                w_star, e_tr = reg_logistic_regression(y_train, x_train_ready, lambda_, np.ones(x_test_ready.shape[1]), 30, gamma)
+                w_star, e_tr = reg_logistic_regression(y_train, x_train_ready, lambda_, np.ones(x_test_ready.shape[1]), 100, gamma)
         
            
                 degr.append(d)
