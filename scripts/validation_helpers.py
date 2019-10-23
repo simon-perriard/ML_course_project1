@@ -164,7 +164,7 @@ def crossValidation_with_loss(x, y, splitRatio, degrees, seed =1):
             #loss for logistic regression
             
             #need to map the y= -1 => y = 0  for logistic regression 's loss computation
-            #t = np.zeros(len(y_test))
+            #t = np.ones(len(y_test))
             #t[np.where(y_test == -1)] = 0
             #e_tr = logistic_loss(t, x_test_ready, w_star)
             
@@ -329,7 +329,7 @@ def crossValidationForLogistic_reg_with_loss(x, y, splitRatio, degrees, seed =1)
                 degr.append(d)
         
                 #map the y= -1 => y = 0
-                t = np.zeros(len(y_test))
+                t = np.ones(len(y_test))
                 t[np.where(y_test == -1)] = 0
                 
                 #compute the loss on the test set

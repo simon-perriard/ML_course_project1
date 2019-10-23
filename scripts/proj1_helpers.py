@@ -2,7 +2,7 @@
 """some helper functions for project 1."""
 import csv
 import numpy as np
-import implementations
+from implementations import *
 
 
 def load_csv_data(data_path, sub_sample=False):
@@ -40,7 +40,7 @@ def predict_labels(weights, data):
 def predict_labels_logistic(w, data):
 
 
-    pred = sigmoid(w @ data)
+    pred = sigmoid(data @ w)
     
     pred[np.where(pred < 0.5)] = -1
     pred[np.where(pred >= 0.5)] = 1
