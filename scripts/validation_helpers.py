@@ -61,11 +61,11 @@ def crossValidation(x, y, splitRatio, degrees, seed =1):
             #w_star, e_tr = logistic_regression(y_train, x_train_ready,np.ones(x_train_ready.shape[1])  ,100, lambda_)
         
             #don't usel least squares with lambda bigger than 0.35 ideal: lambdas = np.arange(0.001,0.13,0.01)
-            w_star, e_tr = least_squares_GD(y_train, x_train_ready,np.ones(x_train_ready.shape[1])  , 100, lambda_)    
+            #w_star, e_tr = least_squares_GD(y_train, x_train_ready,np.ones(x_train_ready.shape[1])  , 100, lambda_)    
             #w_star, e_tr = least_squares_SGD(y_train, x_train,np.ones(x_train.shape[1])  ,400, lambda_)
         
             #closed-form least squares
-            #w_star, e_tr = least_squares(y_train, x_train_ready)  
+            w_star, e_tr = least_squares(y_train, x_train_ready)  
         
             degr.append(d)
         
