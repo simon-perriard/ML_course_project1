@@ -472,6 +472,7 @@ def best_param_selection(y, x, degrees, k_fold, lambdas, seed = 1):
     best_lambdas = []
     best_mses = []
     
+    #compute loss and w for each degree, lambda and permutations
     for degree in degrees:
         mses = []
         for lambda_ in lambdas:
@@ -480,7 +481,8 @@ def best_param_selection(y, x, degrees, k_fold, lambdas, seed = 1):
                 loss_tr, loss_te, w_tr = k_fold_cross_validation(y, x, k_indices, k, lambda_, degree)
                 mses_tmp.append(loss_te)
             mses.append(np.mean(mses_tmp))
-            
+        
+        #chooses best index depending on MSE
         ind_best_lamb = np.argmin(mses)
         best_lambdas.append(lambdas[ind_best_lamb])
         best_mses.append(mses[ind_best_lamb])
@@ -504,7 +506,7 @@ def k_fold_cross_validation(y, x, k_indices, k, lambda_, degree):
     x_tr_poly = build_poly(x_tr, degree)
     x_te_poly = build_poly(x_te, degree)
     
-    #normalize data (DANGER: the test set must be normalized with the training set's mean and std)
+    #normalize data
     mean = np.mean(x_tr_poly, axis =0)
     std = np.std(x_tr_poly, axis = 0)
             
